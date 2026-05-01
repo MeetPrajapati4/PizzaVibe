@@ -36,8 +36,8 @@ const Register = () => {
     setIsSubmitting(true);
     try {
       await register(formData.name, formData.email, formData.password);
-      toast.success('Registration successful! Please login.');
-      navigate('/login');
+      toast.success('Registration successful! Welcome to the tribe.');
+      navigate('/');
     } catch (err) {
       toast.error(err || 'Registration failed');
     } finally {

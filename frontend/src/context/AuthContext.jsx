@@ -63,7 +63,11 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      await axios.post(`${API_URL}/register`, { name, email, password });
+      const res = await axios.post(`${API_URL}/register`, { name, email, password });
+      const { user: userData, token: newToken } = res.data;
+      setUser(userData);
+      setToken(newToken);
+      localStorage.setItem('pizza_user', JSON.stringify(userData));
       return { success: true };
     } catch (error) {
       throw error.response?.data?.message || 'Registration failed';

@@ -9,6 +9,10 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5001',
         changeOrigin: true
+      },
+      '/_/backend': {
+        target: 'http://localhost:5001',
+        changeOrigin: true
       }
     }
   },
