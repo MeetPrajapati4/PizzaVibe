@@ -44,11 +44,14 @@ app.use(errorHandler);
 // Start
 const PORT = process.env.PORT || 5001;
 
+// Initialize database connection
+connectDB().catch(err => {
+  console.error('❌ Failed to connect to database during startup:', err.message);
+});
+
 if (process.env.NODE_ENV !== 'production') {
-  connectDB().then(() => {
-    app.listen(PORT, () => {
-      console.log(`🍕 PizzaVibe API running on port ${PORT}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`🍕 PizzaVibe API running on port ${PORT}`);
   });
 }
 
