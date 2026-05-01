@@ -1,47 +1,46 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const User = sequelize.define('User', {
+const userSchema = new mongoose.Schema({
   name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      len: [2, 100]
-    }
+    type: String,
+    required: [true, 'Please add a name']
   },
   email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-    // No isEmail validator — Admin@Boss is not a standard email format
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email']
   },
   password: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: String,
+    required: [true, 'Please add a password'],
+    minlength: 6,
+    select: true
   },
   role: {
-    type: DataTypes.ENUM('user', 'admin'),
-    defaultValue: 'user'
-  }
-}, {
-  hooks: {
-    beforeCreate: async (user) => {
-      // Only hash if not already a bcrypt hash (prevents double-hashing)
-      if (user.password && !user.password.startsWith('$2')) {
-        user.password = await bcrypt.hash(user.password, 12);
-      }
-    },
-    beforeUpdate: async (user) => {
-      if (user.changed('password') && !user.password.startsWith('$2')) {
-        user.password = await bcrypt.hash(user.password, 12);
-      }
-    }
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
-User.prototype.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+// Encrypt password using bcrypt
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Match user entered password to hashed password in database
+userSchema.methods.matchPassword = async function(enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-export default User;
+export default mongoose.model('User', userSchema);

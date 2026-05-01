@@ -1,38 +1,20 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
-import User from './User.js';
-import Pizza from './Pizza.js';
+import mongoose from 'mongoose';
 
-const Cart = sequelize.define('Cart', {
-  coupon: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  discount: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  }
+const cartItemSchema = new mongoose.Schema({
+  pizzaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pizza', required: true },
+  name: { type: String, required: true },
+  image: { type: String },
+  price: { type: Number, required: true },
+  quantity: { type: Number, default: 1 },
+  size: { type: String, enum: ['small', 'medium', 'large'], default: 'medium' }
 });
 
-Cart.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-User.hasOne(Cart, { foreignKey: 'userId', as: 'cart' });
+const cartSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  items: [cartItemSchema],
+  totalAmount: { type: Number, default: 0 }
+}, { timestamps: true });
 
-const CartItem = sequelize.define('CartItem', {
-  quantity: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 1
-  },
-  size: {
-    type: DataTypes.ENUM('small', 'medium', 'large'),
-    defaultValue: 'medium'
-  }
-});
-
-CartItem.belongsTo(Cart, { foreignKey: 'cartId', as: 'cart' });
-Cart.hasMany(CartItem, { foreignKey: 'cartId', as: 'items' });
-
-CartItem.belongsTo(Pizza, { foreignKey: 'pizzaId', as: 'pizza' });
-
-export { Cart, CartItem };
+export const Cart = mongoose.model('Cart', cartSchema);
+export const CartItem = null; // No longer needed as a separate model in Mongo
 export default Cart;

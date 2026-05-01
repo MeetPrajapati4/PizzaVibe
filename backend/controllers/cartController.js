@@ -1,22 +1,12 @@
-import { Cart, CartItem } from '../models/Cart.js';
+import { Cart } from '../models/Cart.js';
 import Pizza from '../models/Pizza.js';
 
 export const getCart = async (req, res, next) => {
   try {
-    let cart = await Cart.findOne({
-      where: { userId: req.user.id },
-      include: [{
-        model: CartItem,
-        as: 'items',
-        include: [{ model: Pizza, as: 'pizza' }]
-      }]
-    });
-
+    let cart = await Cart.findOne({ userId: req.user.id });
     if (!cart) {
-      cart = await Cart.create({ userId: req.user.id });
-      cart.items = [];
+      cart = await Cart.create({ userId: req.user.id, items: [], totalAmount: 0 });
     }
-
     res.json(cart);
   } catch (error) {
     next(error);
@@ -25,39 +15,36 @@ export const getCart = async (req, res, next) => {
 
 export const addToCart = async (req, res, next) => {
   try {
-    const { pizzaId, quantity = 1, size = 'medium' } = req.body;
-    let cart = await Cart.findOne({ where: { userId: req.user.id } });
+    const { pizzaId, quantity, size } = req.body;
+    const pizza = await Pizza.findById(pizzaId);
+    if (!pizza) return res.status(404).json({ message: 'Pizza not found' });
 
+    let cart = await Cart.findOne({ userId: req.user.id });
     if (!cart) {
-      cart = await Cart.create({ userId: req.user.id });
+      cart = await Cart.create({ userId: req.user.id, items: [], totalAmount: 0 });
     }
 
-    let item = await CartItem.findOne({
-      where: { cartId: cart.id, pizzaId, size }
-    });
+    const price = pizza[`${size}_price`] || pizza.price;
+    const existingItemIndex = cart.items.findIndex(
+      item => item.pizzaId.toString() === pizzaId && item.size === size
+    );
 
-    if (item) {
-      item.quantity += quantity;
-      await item.save();
+    if (existingItemIndex > -1) {
+      cart.items[existingItemIndex].quantity += Number(quantity);
     } else {
-      await CartItem.create({
-        cartId: cart.id,
+      cart.items.push({
         pizzaId,
+        name: pizza.name,
+        image: pizza.image,
+        price,
         quantity,
         size
       });
     }
 
-    const updatedCart = await Cart.findOne({
-      where: { id: cart.id },
-      include: [{
-        model: CartItem,
-        as: 'items',
-        include: [{ model: Pizza, as: 'pizza' }]
-      }]
-    });
-
-    res.json(updatedCart);
+    cart.totalAmount = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    await cart.save();
+    res.json(cart);
   } catch (error) {
     next(error);
   }
@@ -65,16 +52,20 @@ export const addToCart = async (req, res, next) => {
 
 export const updateCartItem = async (req, res, next) => {
   try {
-    const { itemId } = req.params;
+    const { id: itemId } = req.params;
     const { quantity } = req.body;
 
-    const item = await CartItem.findByPk(itemId);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    const cart = await Cart.findOne({ userId: req.user.id });
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
-    item.quantity = quantity;
-    await item.save();
+    const item = cart.items.id(itemId);
+    if (!item) return res.status(404).json({ message: 'Item not found in cart' });
 
-    res.json({ message: 'Quantity updated' });
+    item.quantity = Number(quantity);
+    cart.totalAmount = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    await cart.save();
+    res.json(cart);
   } catch (error) {
     next(error);
   }
@@ -82,12 +73,15 @@ export const updateCartItem = async (req, res, next) => {
 
 export const removeFromCart = async (req, res, next) => {
   try {
-    const { itemId } = req.params;
-    const item = await CartItem.findByPk(itemId);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    const { id: itemId } = req.params;
+    const cart = await Cart.findOne({ userId: req.user.id });
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
-    await item.destroy();
-    res.json({ message: 'Item removed' });
+    cart.items = cart.items.filter(item => item._id.toString() !== itemId);
+    cart.totalAmount = cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    
+    await cart.save();
+    res.json(cart);
   } catch (error) {
     next(error);
   }
@@ -95,21 +89,13 @@ export const removeFromCart = async (req, res, next) => {
 
 export const clearCart = async (req, res, next) => {
   try {
-    const cart = await Cart.findOne({ where: { userId: req.user.id } });
+    const cart = await Cart.findOne({ userId: req.user.id });
     if (cart) {
-      await CartItem.destroy({ where: { cartId: cart.id } });
+      cart.items = [];
+      cart.totalAmount = 0;
+      await cart.save();
     }
     res.json({ message: 'Cart cleared' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const applyCoupon = async (req, res, next) => {
-  // Simplified for now - can integrate with Coupon model later
-  try {
-    const { code } = req.body;
-    res.json({ message: 'Coupon logic to be integrated with SQL model' });
   } catch (error) {
     next(error);
   }

@@ -1,55 +1,32 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
-import User from './User.js';
+import mongoose from 'mongoose';
 
-const Order = sequelize.define('Order', {
-  totalAmount: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
-  },
-  status: {
-    type: DataTypes.ENUM('pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'),
-    defaultValue: 'pending'
-  },
-  street: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  city: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  state: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  zipCode: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  phone: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  paymentStatus: {
-    type: DataTypes.ENUM('pending', 'completed', 'failed'),
-    defaultValue: 'pending'
-  },
-  paymentMethod: {
-    type: DataTypes.ENUM('cod', 'online'),
-    defaultValue: 'cod'
-  },
-  couponApplied: {
-    type: DataTypes.STRING,
-    allowNull: true
-  },
-  discount: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  }
+const orderItemSchema = new mongoose.Schema({
+  pizzaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pizza' },
+  name: { type: String, required: true },
+  image: { type: String },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
+  size: { type: String, enum: ['small', 'medium', 'large'], default: 'medium' }
 });
 
-Order.belongsTo(User, { foreignKey: 'userId', as: 'user' });
-User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
+const orderSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  items: [orderItemSchema],
+  totalAmount: { type: Number, required: true },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'],
+    default: 'pending'
+  },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  zipCode: { type: String, required: true },
+  phone: { type: String, required: true },
+  paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
+  paymentMethod: { type: String, enum: ['cod', 'online'], default: 'cod' },
+  couponApplied: { type: String },
+  discount: { type: Number, default: 0 }
+}, { timestamps: true });
 
-export default Order;
+export default mongoose.model('Order', orderSchema);

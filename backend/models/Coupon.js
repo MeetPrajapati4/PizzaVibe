@@ -1,36 +1,13 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
+import mongoose from 'mongoose';
 
-const Coupon = sequelize.define('Coupon', {
-  code: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  discount: {
-    type: DataTypes.INTEGER, // Percentage
-    allowNull: false
-  },
-  minOrder: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  maxDiscount: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  isActive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
-  },
-  usedCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  expiryDate: {
-    type: DataTypes.DATE,
-    allowNull: true
-  }
-});
+const couponSchema = new mongoose.Schema({
+  code: { type: String, required: true, unique: true },
+  discount: { type: Number, required: true },
+  minOrder: { type: Number, default: 0 },
+  maxDiscount: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
+  usedCount: { type: Number, default: 0 },
+  expiryDate: { type: Date, required: false }
+}, { timestamps: true });
 
-export default Coupon;
+export default mongoose.model('Coupon', couponSchema);

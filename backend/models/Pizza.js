@@ -1,54 +1,17 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/db.js';
+import mongoose from 'mongoose';
 
-const Pizza = sequelize.define('Pizza', {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      len: [1, 100]
-    }
-  },
-  image: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  price: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
-  },
-  small_price: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  medium_price: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  large_price: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  category: {
-    type: DataTypes.ENUM('veg', 'non-veg', 'premium'),
-    allowNull: false
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  },
-  averageRating: {
-    type: DataTypes.DECIMAL(3, 1),
-    defaultValue: 0
-  },
-  totalReviews: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
-  },
-  isAvailable: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
-  }
-});
+const pizzaSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  image: { type: String, required: true },
+  description: { type: String },
+  category: { type: String, enum: ['veg', 'non-veg', 'premium'], default: 'veg' },
+  price: { type: Number, required: true },
+  small_price: { type: Number },
+  medium_price: { type: Number },
+  large_price: { type: Number },
+  isAvailable: { type: Boolean, default: true },
+  averageRating: { type: Number, default: 4.5 },
+  totalReviews: { type: Number, default: 0 }
+}, { timestamps: true });
 
-export default Pizza;
+export default mongoose.model('Pizza', pizzaSchema);

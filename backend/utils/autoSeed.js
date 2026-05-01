@@ -26,7 +26,7 @@ const PIZZAS = [
 export const autoSeed = async () => {
   try {
     // 1. Ensure Admin exists
-    const adminExists = await User.findOne({ where: { email: 'Admin@Boss' } });
+    const adminExists = await User.findOne({ email: 'Admin@Boss' });
     if (!adminExists) {
       await User.create({
         name: 'The Boss',
@@ -34,11 +34,11 @@ export const autoSeed = async () => {
         password: 'Admin@BossPassword123',
         role: 'admin'
       });
-      console.log('👑 Admin@Boss account auto-created.');
+      console.log('👑 Admin@Boss account auto-created (MongoDB).');
     }
 
     // 2. Ensure Pizzas exist
-    const pizzaCount = await Pizza.count();
+    const pizzaCount = await Pizza.countDocuments();
     if (pizzaCount === 0) {
       const processedPizzas = PIZZAS.map((p, idx) => ({
         ...p,
@@ -48,18 +48,18 @@ export const autoSeed = async () => {
         isAvailable: true,
         averageRating: 4.5 + (idx % 5) / 10
       }));
-      await Pizza.bulkCreate(processedPizzas);
-      console.log(`🍕 Auto-seeded ${processedPizzas.length} artisan pizzas.`);
+      await Pizza.insertMany(processedPizzas);
+      console.log(`🍕 Auto-seeded ${processedPizzas.length} artisan pizzas (MongoDB).`);
     }
 
     // 3. Ensure Coupons exist
-    const couponCount = await Coupon.count();
+    const couponCount = await Coupon.countDocuments();
     if (couponCount === 0) {
-      await Coupon.bulkCreate([
+      await Coupon.insertMany([
         { code: 'WELCOME20', discount: 20, minOrder: 300, maxDiscount: 200, expiryDate: new Date('2027-12-31') },
         { code: 'PIZZAVIBE50', discount: 50, minOrder: 500, maxDiscount: 500, expiryDate: new Date('2027-06-30') }
       ]);
-      console.log('🎟️ Auto-seeded starter coupons.');
+      console.log('🎟️ Auto-seeded starter coupons (MongoDB).');
     }
   } catch (error) {
     console.warn('⚠️ Auto-seeding skipped or failed:', error.message);
