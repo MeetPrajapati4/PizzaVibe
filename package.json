@@ -8,7 +8,8 @@
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "seed": "cd backend && npm run seed",
-    "start:backend": "cd backend && npm start"
+    "start:backend": "cd backend && npm start",
+    "build": "cd frontend && npm install && npm run build"
   },
   "experimentalServices": {
     "frontend": {
@@ -23,6 +24,24 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
-    "@supabase/supabase-js": "^2.105.1"
+    "@supabase/supabase-js": "^2.105.1",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dominos": "^3.3.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.2.0",
+    "google-auth-library": "^10.6.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.20.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8"
   }
 }
