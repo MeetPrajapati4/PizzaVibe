@@ -58,13 +58,13 @@ export const login = async (req, res, next) => {
     }
 
     // Find user by email (works for Admin@Boss as well as regular emails)
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -84,7 +84,7 @@ export const getProfile = async (req, res) => {
 export const updateProfile = async (req, res, next) => {
   try {
     const { name, email } = req.body;
-    const user = await User.findById(req.user.id);
+    const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

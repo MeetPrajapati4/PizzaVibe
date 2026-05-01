@@ -4,20 +4,20 @@ const errorHandler = (err, req, res, _next) => {
   const status = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message).join(', ');
+  // Sequelize validation error
+  if (err.name === 'SequelizeValidationError') {
+    const message = err.errors.map(e => e.message).join(', ');
     return res.status(400).json({ message });
   }
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
+  // Sequelize duplicate key
+  if (err.name === 'SequelizeUniqueConstraintError') {
     return res.status(409).json({ message: 'Duplicate field value entered' });
   }
 
-  // Mongoose bad ObjectId
-  if (err.name === 'CastError') {
-    return res.status(400).json({ message: 'Resource not found or invalid ID format' });
+  // Sequelize database error (e.g. invalid UUID format)
+  if (err.name === 'SequelizeDatabaseError') {
+    return res.status(400).json({ message: 'Resource not found or invalid format' });
   }
 
   res.status(status).json({

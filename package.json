@@ -2,10 +2,10 @@
   "name": "pizzavibe",
   "version": "1.0.0",
   "private": true,
-  "description": "PizzaVibe — Production-ready Pizza Delivery Application",
+  "description": "PizzaVibe — The Delivery Application",
   "scripts": {
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
-    "dev:backend": "node scripts/start-mysql.cjs && cd backend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "seed": "cd backend && npm run seed",
     "start:backend": "cd backend && npm start"
@@ -22,7 +22,6 @@
     }
   },
   "dependencies": {
-    "mongoose": "^9.6.1",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1"
   }

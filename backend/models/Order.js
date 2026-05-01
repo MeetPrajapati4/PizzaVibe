@@ -1,32 +1,39 @@
-import mongoose from 'mongoose';
+import { DataTypes } from 'sequelize';
+import { sequelize } from '../config/db.js';
 
-const orderItemSchema = new mongoose.Schema({
-  pizzaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pizza' },
-  name: { type: String, required: true },
-  image: { type: String },
-  price: { type: Number, required: true },
-  quantity: { type: Number, required: true },
-  size: { type: String, enum: ['small', 'medium', 'large'], default: 'medium' }
-});
-
-const orderSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  items: [orderItemSchema],
-  totalAmount: { type: Number, required: true },
-  status: {
-    type: String,
-    enum: ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled'],
-    default: 'pending'
+const Order = sequelize.define('Order', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
   },
-  street: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipCode: { type: String, required: true },
-  phone: { type: String, required: true },
-  paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-  paymentMethod: { type: String, enum: ['cod', 'online'], default: 'cod' },
-  couponApplied: { type: String },
-  discount: { type: Number, default: 0 }
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false
+  },
+  totalAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
+  },
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: 'pending'
+  },
+  street: { type: DataTypes.STRING, allowNull: false },
+  city: { type: DataTypes.STRING, allowNull: false },
+  state: { type: DataTypes.STRING, allowNull: false },
+  zipCode: { type: DataTypes.STRING, allowNull: false },
+  phone: { type: DataTypes.STRING, allowNull: false },
+  paymentStatus: {
+    type: DataTypes.STRING,
+    defaultValue: 'pending'
+  },
+  paymentMethod: {
+    type: DataTypes.STRING,
+    defaultValue: 'cod'
+  },
+  couponApplied: { type: DataTypes.STRING },
+  discount: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 }
 }, { timestamps: true });
 
-export default mongoose.model('Order', orderSchema);
+export default Order;

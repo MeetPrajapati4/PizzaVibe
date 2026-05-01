@@ -22,14 +22,11 @@ const OrderItem = sequelize.define('OrderItem', {
     defaultValue: 1
   },
   size: {
-    type: DataTypes.ENUM('small', 'medium', 'large'),
+    type: DataTypes.STRING,
     defaultValue: 'medium'
   }
 });
 
-OrderItem.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
-Order.hasMany(OrderItem, { foreignKey: 'orderId', as: 'items' });
-
-OrderItem.belongsTo(Pizza, { foreignKey: 'pizzaId', as: 'pizza' });
+// Associations are now defined in models/index.js
 
 export default OrderItem;

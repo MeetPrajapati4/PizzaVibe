@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
+import { sequelize } from './config/db.js';
 import User from './models/User.js';
 import Pizza from './models/Pizza.js';
 import Coupon from './models/Coupon.js';
@@ -27,22 +27,19 @@ const PIZZAS = [
 
 async function seedData() {
   try {
-    const mongoURI = process.env.MONGODB_URI || process.env.DATABASE_URL;
-    if (!mongoURI) throw new Error('MONGODB_URI is not defined in .env');
+    await sequelize.authenticate();
+    console.log('✅ Connected to Database for seeding.');
 
-    await mongoose.connect(mongoURI);
-    console.log('✅ Connected to MongoDB for seeding.');
+    // Sync models (creates tables if they don't exist, use force: true to drop and recreate)
+    await sequelize.sync({ force: true });
+    console.log('🗑️ Existing tables dropped and recreated.');
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Pizza.deleteMany({});
-    await Coupon.deleteMany({});
-    console.log('🗑️ Existing data cleared.');
-
-    await User.create([
-      { name: 'Admin', email: 'Admin@Boss', password: 'Admin@BossPassword123', role: 'admin' },
+    // Note: Since User model has hooks that hash the password on create, we use User.create instead of bulkCreate to ensure hooks run,
+    // or use bulkCreate with individualHooks: true.
+    await User.bulkCreate([
+      { name: 'Admin', email: 'admin@pizzavibe.com', password: 'Admin@BossPassword123', role: 'admin' },
       { name: 'Demo User', email: 'user@pizzavibe.com', password: 'User@123', role: 'user' }
-    ]);
+    ], { individualHooks: true });
 
     const processedPizzas = PIZZAS.map((p, idx) => ({
       ...p,
@@ -54,14 +51,15 @@ async function seedData() {
       totalReviews: 120 + idx * 30
     }));
 
-    await Pizza.insertMany(processedPizzas);
+    await Pizza.bulkCreate(processedPizzas);
     console.log(`🍕 Seeded ${processedPizzas.length} artisan pizzas.`);
 
-    await Coupon.insertMany([
+    await Coupon.bulkCreate([
       { code: 'WELCOME20', discount: 20, minOrder: 300, maxDiscount: 200, expiryDate: new Date('2027-12-31') },
       { code: 'PIZZAVIBE50', discount: 50, minOrder: 500, maxDiscount: 500, expiryDate: new Date('2027-06-30') }
     ]);
 
+    console.log('👑 Admin account admin@pizzavibe.com seeded.');
     console.log('✅ Database seeded successfully!');
     process.exit(0);
   } catch (error) {

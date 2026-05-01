@@ -12,7 +12,7 @@ export const configurePassport = () => {
   async (accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails[0].value;
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ where: { email } });
 
       if (!user) {
         user = await User.create({
@@ -35,7 +35,7 @@ export const configurePassport = () => {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await User.findById(id);
+      const user = await User.findByPk(id);
       done(null, user);
     } catch (err) {
       done(err, null);

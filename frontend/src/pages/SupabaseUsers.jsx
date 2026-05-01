@@ -20,7 +20,7 @@ const SupabaseUsers = () => {
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('id', { ascending: false });
 
       if (error) throw error;
       setUsers(data || []);
@@ -34,6 +34,18 @@ const SupabaseUsers = () => {
 
   useEffect(() => {
     fetchUsers();
+
+    // Realtime subscription — auto-refresh on any change to 'Users' table
+    const channel = supabase
+      .channel('realtime:users')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'users' },
+        () => fetchUsers()
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
   }, []);
 
   // Insert user
@@ -47,12 +59,13 @@ const SupabaseUsers = () => {
     try {
       setInserting(true);
       const { data, error } = await supabase
-        .from('users')
+        .from('Users')
         .insert([
           { 
             name: formData.name, 
             email: formData.email,
-            created_at: new Date().toISOString()
+            password: 'Password_123', // required by user model
+            role: 'user'
           }
         ])
         .select();
@@ -204,11 +217,11 @@ const SupabaseUsers = () => {
                             </p>
                           </div>
                           <span className="text-[10px] uppercase tracking-widest text-slate-500 bg-slate-800 px-2 py-1 rounded-md">
-                            {user.id ? `ID: ${user.id.slice(0, 8)}...` : 'PENDING'}
+                            {user.id ? `ID: ${user.id}` : 'PENDING'}
                           </span>
                         </div>
                         <div className="mt-3 pt-3 border-t border-slate-800/50 flex justify-between items-center text-[11px] text-slate-500">
-                           <span>{new Date(user.created_at).toLocaleDateString()}</span>
+                           <span>Active User</span>
                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                         </div>
                       </motion.div>
@@ -220,22 +233,6 @@ const SupabaseUsers = () => {
           </motion.div>
         </div>
       </div>
-
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #1e293b;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #334155;
-        }
-      `}</style>
     </div>
   );
 };
