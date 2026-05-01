@@ -14,9 +14,8 @@ const PIZZA_BACKUP = "https://images.unsplash.com/photo-1513104890138-7c749659a5
 
 import axios from 'axios';
 
-// API Base Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-const API_URL = `${API_BASE_URL}/_/backend/api`; // Using the new /_/backend prefix
+// API Base Configuration - Using relative paths for seamless Vercel deployment
+const API_URL = '/_/backend/api';
 
 export const getByCategory = async (category) => {
   try {

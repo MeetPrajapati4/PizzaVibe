@@ -64,38 +64,46 @@ const Menu = () => {
       setLoading(true);
       try {
         const data = await getByCategory('pizzas');
-        if (data && Array.isArray(data)) {
-          const localized = data.map(item => localizeItem(item));
-          
-          // --- UNIVERSAL UNIQUENESS GUARD (Name, Image, Price, Description) ---
-          const uniqueItems = [];
-          const seenNames = new Set();
-          const seenImages = new Set();
-          const seenPrices = new Set();
-          const seenDescs = new Set();
+        let finalItems = [];
 
-          localized.forEach(item => {
-            const normalizedName = item.name.toLowerCase().trim();
-            const normalizedImage = item.image.split('?')[0].trim();
-            const priceKey = String(item.price);
-            const descKey = item.description?.toLowerCase().trim().substring(0, 50);
-            
-            if (
-              !seenNames.has(normalizedName) && 
-              !seenImages.has(normalizedImage) && 
-              !seenPrices.has(priceKey) &&
-              (!descKey || !seenDescs.has(descKey))
-            ) {
-              seenNames.add(normalizedName);
-              seenImages.add(normalizedImage);
-              seenPrices.add(priceKey);
-              if (descKey) seenDescs.add(descKey);
-              uniqueItems.push(item);
-            }
-          });
-          
-          setItems(uniqueItems);
+        if (data && Array.isArray(data) && data.length > 0) {
+          finalItems = data.map(item => localizeItem(item));
+        } else {
+          // --- HIGH-FIDELITY FALLBACK (Ensures Menu Always Shows) ---
+          const fallback = [
+            { id: 'f1', name: 'Classic Margherita', image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80', price: 299, category: 'veg', description: 'Fresh mozzarella, tomato sauce, and aromatic basil.' },
+            { id: 'f2', name: 'Truffle Mushroom Italian', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&q=80', price: 589, category: 'premium', description: 'Wild mushrooms with truffle oil and fresh thyme.' },
+            { id: 'f3', name: 'Prawn Pesto', image: 'https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800&q=80', price: 649, category: 'premium', description: 'Tiger prawns, house-made basil pesto, and goat cheese.' },
+            { id: 'f4', name: 'Seafood Sensation', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80', price: 699, category: 'premium', description: 'Squid, mussels, prawns, and tuna.' },
+            { id: 'f5', name: 'Burrata & Prosciutto', image: 'https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?w=800&q=80', price: 749, category: 'premium', description: 'Whole burrata cheese and premium prosciutto.' },
+            { id: 'f6', name: 'Spiced Lamb Kofta', image: 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&q=80', price: 619, category: 'non-veg', description: 'Moroccan-spiced lamb and mint yogurt.' },
+            { id: 'f7', name: 'Butter Chicken Special', image: 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=800&q=80', price: 599, category: 'non-veg', description: 'Classic butter chicken gravy base.' },
+            { id: 'f8', name: 'Peri-Peri Poultry', image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=800&q=80', price: 529, category: 'non-veg', description: 'Peri-peri marinated chicken and red peppers.' },
+            { id: 'f9', name: 'Four Cheese Bliss', image: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=800&q=80', price: 519, category: 'premium', description: 'Mozzarella, gorgonzola, parmesan, and cheddar.' }
+          ];
+          finalItems = fallback.map(item => localizeItem(item));
         }
+        
+        // --- UNIVERSAL UNIQUENESS GUARD ---
+        const uniqueItems = [];
+        const seenNames = new Set();
+        const seenImages = new Set();
+        const seenPrices = new Set();
+
+        finalItems.forEach(item => {
+          const normalizedName = item.name.toLowerCase().trim();
+          const normalizedImage = item.image.split('?')[0].trim();
+          const priceKey = String(item.price);
+          
+          if (!seenNames.has(normalizedName) && !seenImages.has(normalizedImage) && !seenPrices.has(priceKey)) {
+            seenNames.add(normalizedName);
+            seenImages.add(normalizedImage);
+            seenPrices.add(priceKey);
+            uniqueItems.push(item);
+          }
+        });
+        
+        setItems(uniqueItems);
       } catch (error) {
         console.error("Failed to fetch menu:", error);
       }
