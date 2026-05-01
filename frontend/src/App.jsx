@@ -21,6 +21,8 @@ import ManagePizzas from './pages/admin/ManagePizzas';
 import ManageOrders from './pages/admin/ManageOrders';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageCoupons from './pages/admin/ManageCoupons';
+import SupabaseUsers from './pages/SupabaseUsers';
+
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
 import PreLoader from './components/PreLoader';
@@ -75,12 +77,12 @@ function App() {
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
               <Routes location={location}>
-                <Route path="/" element={<Home />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/menu" element={<ProtectedRoute><Menu /></ProtectedRoute>} />
+                <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/cart" element={<Cart />} />
+                <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                 <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
                 <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
@@ -91,6 +93,8 @@ function App() {
                 <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
                 <Route path="/admin/users" element={<ProtectedRoute adminOnly><ManageUsers /></ProtectedRoute>} />
                 <Route path="/admin/coupons" element={<ProtectedRoute adminOnly><ManageCoupons /></ProtectedRoute>} />
+                <Route path="/supabase" element={<SupabaseUsers />} />
+
               </Routes>
               <Footer />
             </motion.div>

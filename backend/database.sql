@@ -17,7 +17,6 @@ CREATE TABLE Users (
     email VARCHAR(150) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('user', 'admin') DEFAULT 'user',
-    avatar VARCHAR(255) DEFAULT 'https://ui-avatars.com/api/?name=User&background=random',
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -34,8 +33,6 @@ CREATE TABLE Pizzas (
     medium_price DECIMAL(10, 2) DEFAULT 0,
     large_price DECIMAL(10, 2) DEFAULT 0,
     isAvailable BOOLEAN DEFAULT TRUE,
-    averageRating DECIMAL(3, 1) DEFAULT 0.0,
-    totalReviews INT DEFAULT 0,
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -97,10 +94,6 @@ CREATE TABLE Coupons (
 -- Admin Credentials: admin@pizzavibe.com / Admin@123
 INSERT INTO Users (name, email, password, role) 
 VALUES ('System Admin', 'admin@pizzavibe.com', '$2a$12$j0i5zpTKaOmERAGizWjbz.GRXw.XCv815FuOR7n2b32N.DLJPKHG.', 'admin');
-
--- Demo User: user@pizzavibe.com / User@123
-INSERT INTO Users (name, email, password, role) 
-VALUES ('Demo User', 'user@pizzavibe.com', '$2a$12$R6Mv.B6u6X5hG7u2j9zUGuJ1p7Wp6G6K6U6U6U6U6U6U6U6U6U6U.', 'user');
 
 -- Sample Artisanal Pizzas
 INSERT INTO Pizzas (name, image, description, category, price, small_price, medium_price, large_price, averageRating, totalReviews)

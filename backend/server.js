@@ -28,15 +28,19 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 app.use(express.json({ limit: '10mb' }));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/pizzas', pizzaRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/dominos', dominosRoutes);
-app.use('/api/admin', adminRoutes);
+const router = express.Router();
+router.use('/auth', authRoutes);
+router.use('/pizzas', pizzaRoutes);
+router.use('/cart', cartRoutes);
+router.use('/orders', orderRoutes);
+router.use('/dominos', dominosRoutes);
+router.use('/admin', adminRoutes);
 
 // Health check
-app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+router.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+app.use('/api', router);
+app.use('/_/backend/api', router);
 
 // Global error handler
 app.use(errorHandler);

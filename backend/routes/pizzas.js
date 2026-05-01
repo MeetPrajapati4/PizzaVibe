@@ -4,8 +4,8 @@ import { protect, adminOnly } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', getAllPizzas);
-router.get('/:id', getPizzaById);
+router.get('/', protect, getAllPizzas);
+router.get('/:id', protect, getPizzaById);
 router.post('/', protect, adminOnly, createPizza);
 router.put('/:id', protect, adminOnly, updatePizza);
 router.delete('/:id', protect, adminOnly, deletePizza);

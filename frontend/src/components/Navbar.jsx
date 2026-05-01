@@ -33,6 +33,7 @@ const Navbar = () => {
     { name: 'About', path: '/about' },
     { name: 'Menu', path: '/menu' },
     { name: 'Orders', path: '/orders' },
+    { name: 'Supabase', path: '/supabase' },
   ];
 
   if (user?.role === 'admin') {

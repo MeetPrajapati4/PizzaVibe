@@ -19,7 +19,7 @@ const validateRegister = [
   }
 ];
 
-router.post('/register', register);
+router.post('/register', validateRegister, register);
 router.post('/login', login);
 
 router.get('/profile', protect, getProfile);
