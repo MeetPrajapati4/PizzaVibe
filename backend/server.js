@@ -42,10 +42,14 @@ app.get('/api/health', (_, res) => res.json({ status: 'ok', timestamp: new Date(
 app.use(errorHandler);
 
 // Start
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🍕 PizzaVibe API running on port ${PORT}`);
+if (process.env.NODE_ENV !== 'production') {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`🍕 PizzaVibe API running on port ${PORT}`);
+    });
   });
-});
+}
+
+export default app;
