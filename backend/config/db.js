@@ -36,6 +36,10 @@ const connectDB = async () => {
     // Sync models
     await sequelize.sync({ alter: true }); 
     console.log('🔄 Database models synchronized');
+
+    // Auto-seed essential data
+    const { autoSeed } = await import('../utils/autoSeed.js');
+    await autoSeed();
   } catch (error) {
     console.error(`❌ MySQL connection error: ${error.message}`);
     console.log('💡 Ensure XAMPP MySQL is running and database "pizzavibe" exists.');
