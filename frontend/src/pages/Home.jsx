@@ -282,31 +282,37 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Feature Grid: Elevated */}
-      <section className="py-32 bg-surface-100 rounded-[5rem] mx-4 shadow-premium relative overflow-hidden">
-        <div className="container mx-auto px-6 grid md:grid-cols-3 gap-12 relative z-10">
-          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
-             <div className="w-20 h-20 bg-brand-500 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-transform">
-               <FiTruck className="w-10 h-10" />
+      {/* Feature Grid: More Details, Less Size */}
+      <section className="py-20 bg-surface-100 rounded-[4rem] mx-4 shadow-premium relative overflow-hidden">
+        <div className="container mx-auto px-6 grid md:grid-cols-3 gap-8 relative z-10">
+          <div className="group space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:scale-105 transition-transform">
+               <FiTruck className="w-8 h-8" />
              </div>
-             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Hyper-Local <br/> Logistics</h3>
-             <p className="text-surface-400 font-medium leading-relaxed">Our proprietary routing algorithm guarantees the shortest path from oven to table.</p>
+             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter leading-none">Hyper-Local <br/> Logistics</h3>
+             <p className="text-surface-400 text-[11px] font-medium leading-relaxed">
+               Proprietary routing algorithms calculate the shortest delivery paths in real-time, ensuring your pizza maintains a constant 65°C core temperature from oven to your doorstep.
+             </p>
           </div>
 
-          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
-             <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:-rotate-6 transition-transform">
-               <FiStar className="w-10 h-10" />
+          <div className="group space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:scale-105 transition-transform">
+               <FiStar className="w-8 h-8" />
              </div>
-             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Artisanal <br/> Standards</h3>
-             <p className="text-surface-400 font-medium leading-relaxed">Each pizza undergoes a 3-point quality check by our Head Pizzaiolo before leaving.</p>
+             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter leading-none">Artisanal <br/> Standards</h3>
+             <p className="text-surface-400 text-[11px] font-medium leading-relaxed">
+               Our 48-hour fermentation process uses organic Tipo 00 flour and filtered water, resulting in a light, airy 'cornicione' that is both digestible and incredibly flavorful.
+             </p>
           </div>
 
-          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
-             <div className="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:rotate-12 transition-transform">
-               <FiZap className="w-10 h-10" />
+          <div className="group space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:scale-105 transition-transform">
+               <FiZap className="w-8 h-8" />
              </div>
-             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Digital <br/> Concierge</h3>
-             <p className="text-surface-400 font-medium leading-relaxed">Seamless 1-click ordering, real-time heat mapping, and elite 24/7 vibe support.</p>
+             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter leading-none">Digital <br/> Concierge</h3>
+             <p className="text-surface-400 text-[11px] font-medium leading-relaxed">
+               Seamless 1-click ordering integrated with AI-driven flavor recommendations based on your historical vibes and local trending collections.
+             </p>
           </div>
         </div>
       </section>
