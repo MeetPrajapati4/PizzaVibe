@@ -110,7 +110,5 @@ const FoodCard = ({ food }) => {
     </TiltContainer>
   );
 };
-  );
-};
 
 export default React.memo(FoodCard);
