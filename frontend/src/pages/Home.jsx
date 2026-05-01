@@ -1,12 +1,32 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiZap, FiSmile, FiTruck, FiAward, FiStar, FiClock } from 'react-icons/fi';
+import { FiArrowRight, FiZap, FiSmile, FiTruck, FiAward, FiStar, FiClock, FiPlus } from 'react-icons/fi';
 import TiltContainer from '../components/TiltContainer';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const StaggeredText = ({ text, className }) => {
+  const words = text.split(" ");
+  return (
+    <span className={className}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: i * 0.1 }}
+          viewport={{ once: true }}
+          className="inline-block mr-2"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
 
 const IngredientParticle = ({ icon, className, delay = 0 }) => (
   <motion.div
@@ -41,7 +61,6 @@ const ChefPickCard = ({ name, price, image, tag }) => (
         <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
         
-        {/* Hover Content */}
         <div className="absolute top-8 left-8">
           <div className="px-5 py-2 bg-brand-500 rounded-full text-[10px] font-black text-white uppercase tracking-widest shadow-2xl transform -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
             {tag}
@@ -52,9 +71,9 @@ const ChefPickCard = ({ name, price, image, tag }) => (
           <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter mb-2 leading-none">{name}</h3>
           <div className="flex items-center justify-between">
             <p className="text-brand-500 text-xl font-black">₹{price}</p>
-            <div className="flex gap-1 text-amber-500">
-              {[...Array(5)].map((_, i) => <FiStar key={i} className="w-3 h-3 fill-current" />)}
-            </div>
+            <Link to="/menu" className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-black hover:bg-brand-500 hover:text-white transition-colors duration-300">
+              <FiPlus className="w-6 h-6" />
+            </Link>
           </div>
         </div>
       </div>
@@ -64,6 +83,9 @@ const ChefPickCard = ({ name, price, image, tag }) => (
 
 const Home = () => {
   const containerRef = useRef(null);
+  const heroRef = useRef(null);
+  const isHeroInView = useInView(heroRef, { once: true });
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
@@ -116,6 +138,12 @@ const Home = () => {
 
   return (
     <div className="relative bg-surface-50" ref={containerRef}>
+      {/* Scroll Progress Bar */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-1 bg-brand-500 origin-left z-[10000]"
+        style={{ scaleX: scrollYProgress }}
+      />
+
       {/* Dynamic Background Orbs */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="bg-orb absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-brand-500/5 blur-[120px] rounded-full" />
@@ -124,163 +152,194 @@ const Home = () => {
       </div>
 
       {/* Hero Section: Cinematic and Balanced */}
-      <section className="min-h-[85vh] relative flex items-center pt-24 overflow-hidden">
-        <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-8 items-center relative z-10">
+      <section className="min-h-[90vh] relative flex items-center pt-24 overflow-hidden" ref={heroRef}>
+        <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10">
           
           {/* Left: Content */}
-          <div className="space-y-8 text-center lg:text-left">
+          <div className="space-y-10 text-center lg:text-left">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              animate={isHeroInView ? { opacity: 1, x: 0 } : {}}
               className="inline-flex items-center gap-3 px-5 py-2 bg-brand-500/10 border border-brand-500/20 rounded-full"
             >
               <span className="w-2 h-2 bg-brand-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(255,77,79,0.5)]" />
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-brand-500">Elite Delivery</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-brand-500">Elite Delivery Experience</span>
             </motion.div>
 
-            <div className="space-y-3">
-              <h1 className="text-6xl md:text-[6.5rem] font-display font-black leading-[0.8] tracking-tighter text-surface-900 overflow-hidden">
-                <span className="hero-line block">CRAFTED</span>
-                <span className="hero-line block animate-text-shimmer">VIBE.</span>
-                <span className="hero-line block">PURE TASTE.</span>
+            <div className="space-y-4">
+              <h1 className="text-6xl md:text-[7.5rem] font-display font-black leading-[0.8] tracking-tighter text-surface-900">
+                <span className="hero-line block overflow-hidden">CRAFTED</span>
+                <span className="hero-line block animate-text-shimmer overflow-hidden">VIBE.</span>
+                <span className="hero-line block overflow-hidden">PURE ART.</span>
               </h1>
-              <motion.p 
+              <motion.div 
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                animate={isHeroInView ? { opacity: 1 } : {}}
                 transition={{ delay: 1 }}
-                className="text-lg md:text-xl text-surface-600 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium"
               >
-                Experience the architectural fusion of Napolitano tradition and modern culinary art. Hand-stretched dough, 48-hour fermentation.
-              </motion.p>
+                <StaggeredText 
+                  text="Architectural fusion of Napolitano tradition and modern culinary art. Every bite is a vibe." 
+                  className="text-lg md:text-xl text-surface-600 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium block"
+                />
+              </motion.div>
             </div>
 
             <motion.div 
               initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 1.2 }}
-              className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row items-center gap-8 justify-center lg:justify-start"
             >
-              <Link to="/menu" className="btn-primary group !px-10 !py-5 text-xs">
-                Explore Menu
+              <Link to="/menu" className="btn-primary group !px-12 !py-5 text-xs">
+                Start Your Vibe
                 <FiArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
               </Link>
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-3 border-surface-50 overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?img=${i+20}`} alt="User" />
-                  </div>
-                ))}
-                <div className="w-10 h-10 rounded-full border-3 border-surface-50 bg-surface-200 flex items-center justify-center text-[9px] font-black">
-                  +12K
+              <div className="flex items-center gap-4">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-full border-3 border-surface-50 overflow-hidden">
+                      <img src={`https://i.pravatar.cc/100?img=${i+30}`} alt="User" />
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <p className="text-xs font-black text-surface-900 leading-none">12K+ Vibers</p>
+                  <p className="text-[9px] font-bold text-surface-500 uppercase tracking-widest">Active Daily</p>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Right: Immersive 3D Visual - Scaled Down */}
+          {/* Right: Immersive 3D Visual */}
           <div className="relative">
             <motion.div 
               style={{ rotate: pizzaRotate, y: pizzaY }}
-              className="relative z-10 mx-auto w-full max-w-[500px] aspect-square"
+              className="relative z-10 mx-auto w-full max-w-[550px] aspect-square"
             >
               <TiltContainer intensity={25} className="w-full h-full">
                 <div className="relative animate-loop-3d">
                   <img 
-                    src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=100&w=1000" 
+                    src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=100&w=1200" 
                     alt="Premium PizzaVibe"
-                    className="w-full h-full object-cover rounded-full shadow-[0_60px_120px_-20px_rgba(0,0,0,0.5)] border-[1rem] border-white/10"
+                    className="w-full h-full object-cover rounded-full shadow-[0_80px_150px_-30px_rgba(0,0,0,0.6)] border-[1.2rem] border-white/10"
                   />
                   
-                  {/* Floating Micro-Badge - Scaled Down */}
-                  <div className="absolute -top-5 -right-5 glass p-6 rounded-[2rem] shadow-2xl backdrop-blur-3xl border-white/10 z-20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shadow-brand">
-                        <FiClock className="w-5 h-5" />
+                  {/* Floating Micro-Badge */}
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.5 }}
+                    className="absolute -top-5 -right-5 glass p-7 rounded-[2.5rem] shadow-2xl backdrop-blur-3xl border-white/10 z-20"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-brand-500 rounded-2xl flex items-center justify-center text-white shadow-brand">
+                        <FiClock className="w-6 h-6" />
                       </div>
                       <div className="text-left">
-                        <p className="text-xs font-black text-surface-900 leading-none mb-1">Express</p>
-                        <p className="text-[9px] text-surface-500 font-bold uppercase tracking-widest">20 MIN</p>
+                        <p className="text-sm font-black text-surface-900 leading-none mb-1">Express</p>
+                        <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest">20 MIN VIBE</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
+
+                  {/* Rating Badge */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1.8 }}
+                    className="absolute bottom-10 -left-10 glass px-6 py-4 rounded-2xl shadow-xl border-white/10 z-20"
+                  >
+                    <div className="flex items-center gap-2">
+                       <FiStar className="text-amber-500 fill-amber-500" />
+                       <span className="text-sm font-black">4.9/5 Rating</span>
+                    </div>
+                  </motion.div>
                 </div>
               </TiltContainer>
             </motion.div>
+
+            {/* Decorative Particles */}
+            <IngredientParticle icon={<FiZap className="w-8 h-8 text-brand-500/10" />} className="top-0 left-0" />
+            <IngredientParticle icon={<FiAward className="w-10 h-10 text-amber-500/10" />} className="bottom-20 right-0" delay={1} />
           </div>
         </div>
       </section>
 
-      {/* Live Order Ticker: Added Value */}
-      <div className="bg-surface-900 py-4 overflow-hidden border-y border-white/5 relative z-20">
-        <div className="flex animate-marquee whitespace-nowrap gap-12">
+      {/* Live Order Ticker */}
+      <div className="bg-surface-900 py-5 overflow-hidden border-y border-white/5 relative z-20">
+        <div className="flex animate-marquee whitespace-nowrap gap-16">
           {[1,2,3,4,5,6].map(i => (
-            <div key={i} className="flex items-center gap-4">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
-                Fresh Order: <span className="text-white">Keema Do Pyaza</span> — 2 mins ago
+            <div key={i} className="flex items-center gap-6">
+              <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">
+                Fresh Vibe: <span className="text-white">Truffle Mushroom</span> — Bangalore
               </p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">
-                Fresh Order: <span className="text-white">Truffle Mushroom</span> — 5 mins ago
+              <p className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">
+                Fresh Vibe: <span className="text-white">Classic Margherita</span> — Mumbai
               </p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Feature Grid: Tightened */}
-      <section className="py-24 bg-surface-100 rounded-[4rem] mx-4 shadow-premium relative overflow-hidden">
-        <div className="container mx-auto px-6 grid md:grid-cols-3 gap-10 relative z-10">
-          <div className="space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl">
-             <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center text-white shadow-xl">
-               <FiTruck className="w-8 h-8" />
+      {/* Feature Grid: Elevated */}
+      <section className="py-32 bg-surface-100 rounded-[5rem] mx-4 shadow-premium relative overflow-hidden">
+        <div className="container mx-auto px-6 grid md:grid-cols-3 gap-12 relative z-10">
+          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-20 h-20 bg-brand-500 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-transform">
+               <FiTruck className="w-10 h-10" />
              </div>
-             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter">Fast <br/> Logistics</h3>
-             <p className="text-surface-400 text-sm font-medium leading-relaxed">Our proprietary routing algorithm guarantees the shortest path from oven to table.</p>
+             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Hyper-Local <br/> Logistics</h3>
+             <p className="text-surface-400 font-medium leading-relaxed">Our proprietary routing algorithm guarantees the shortest path from oven to table.</p>
           </div>
 
-          <div className="space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl">
-             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
-               <FiStar className="w-8 h-8" />
+          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:-rotate-6 transition-transform">
+               <FiStar className="w-10 h-10" />
              </div>
-             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter">Artisan <br/> Quality</h3>
-             <p className="text-surface-400 text-sm font-medium leading-relaxed">Each pizza undergoes a 3-point quality check by our Head Pizzaiolo before leaving.</p>
+             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Artisanal <br/> Standards</h3>
+             <p className="text-surface-400 font-medium leading-relaxed">Each pizza undergoes a 3-point quality check by our Head Pizzaiolo before leaving.</p>
           </div>
 
-          <div className="space-y-6 p-8 bg-white/5 rounded-[2.5rem] border border-white/5 backdrop-blur-xl">
-             <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl">
-               <FiZap className="w-8 h-8" />
+          <div className="group space-y-8 p-10 bg-white/5 rounded-[3rem] border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500">
+             <div className="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:rotate-12 transition-transform">
+               <FiZap className="w-10 h-10" />
              </div>
-             <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter">Modern <br/> Delivery</h3>
-             <p className="text-surface-400 text-sm font-medium leading-relaxed">Seamless 1-click ordering, real-time heat mapping, and elite support.</p>
+             <h3 className="text-3xl font-display font-black text-white uppercase tracking-tighter leading-none">Digital <br/> Concierge</h3>
+             <p className="text-surface-400 font-medium leading-relaxed">Seamless 1-click ordering, real-time heat mapping, and elite 24/7 vibe support.</p>
           </div>
         </div>
       </section>
 
-      {/* Chef's Signature Masterpieces: Tightened */}
-      <section className="container mx-auto px-6 py-24">
-        <div className="flex flex-col md:flex-row items-end justify-between gap-8 mb-16">
-          <div className="max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-3 px-5 py-1.5 bg-brand-500/10 border border-brand-500/20 rounded-full">
-               <FiAward className="text-brand-500 w-4 h-4" />
-               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-500">Chef's Signature</span>
-            </div>
-            <h2 className="text-5xl md:text-6xl font-display font-black text-surface-900 uppercase tracking-tighter leading-[0.9]">
-              CRAFTING <br/>
+      {/* Chef's Signature Masterpieces */}
+      <section className="container mx-auto px-6 py-32">
+        <div className="flex flex-col md:flex-row items-end justify-between gap-12 mb-24">
+          <div className="max-w-3xl space-y-6 text-center md:text-left">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-3 px-6 py-2 bg-brand-500/10 border border-brand-500/20 rounded-full"
+            >
+               <FiAward className="text-brand-500" />
+               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-500">Elite Collection</span>
+            </motion.div>
+            <h2 className="text-6xl md:text-8xl font-display font-black text-surface-900 uppercase tracking-tighter leading-[0.85]">
+              CULINARY <br/>
               <span className="text-gradient">MASTERPIECES.</span>
             </h2>
-            <p className="text-lg text-surface-500 font-medium max-w-xl leading-relaxed">Our seasonal selection curated for the true pizza enthusiast. Limited availability daily.</p>
+            <p className="text-xl text-surface-500 font-medium max-w-2xl leading-relaxed">Curated seasonal masterpieces that redefine the architectural limits of flavor and texture.</p>
           </div>
-          <Link to="/menu" className="group text-[10px] font-black uppercase text-brand-500 tracking-[0.2em] flex items-center gap-3 hover:gap-5 transition-all duration-500">
-            View Collection <FiArrowRight className="text-xl" />
+          <Link to="/menu" className="group text-xs font-black uppercase text-brand-500 tracking-[0.4em] flex items-center gap-5 hover:gap-8 transition-all duration-500">
+            Full Gallery <FiArrowRight className="text-2xl" />
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
           <ChefPickCard 
             name="Truffle Mushroom"
             price="589"
             image="https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&q=80"
-            tag="Editor's Choice"
+            tag="Chef's Pick"
           />
           <ChefPickCard 
             name="Prawn Pesto"
@@ -289,68 +348,39 @@ const Home = () => {
             tag="Premium"
           />
           <ChefPickCard 
-            name="Greek Feta Feast"
-            price="439"
-            image="https://images.unsplash.com/photo-1555072169-ee53fb05e61a?w=800&q=80"
-            tag="Fresh Harvest"
+            name="Butter Chicken Special"
+            price="599"
+            image="https://images.unsplash.com/photo-1613564834361-9436948817d1?w=800&q=80"
+            tag="Fusion Elite"
           />
         </div>
       </section>
 
-      {/* Stats Section: Scaled Down */}
-      <section className="container mx-auto px-6 py-24">
-        <div className="glass p-16 md:p-24 rounded-[4rem] relative overflow-hidden text-center">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 via-transparent to-blue-500/5" />
-          <div className="relative z-10 grid md:grid-cols-3 gap-16">
-            <div className="space-y-3">
-              <div className="flex items-center justify-center">
-                <p className="text-6xl font-display font-black text-surface-900 stat-number" data-target="52">0</p>
-                <p className="text-4xl font-display font-black text-brand-500">K+</p>
-              </div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-surface-400">Happy Vibers</p>
-            </div>
-            <div className="space-y-3">
-               <div className="flex items-center justify-center">
-                <p className="text-6xl font-display font-black text-surface-900 stat-number" data-target="18">0</p>
-                <p className="text-4xl font-display font-black text-blue-500">+</p>
-              </div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-surface-400">Unique Flavors</p>
-            </div>
-            <div className="space-y-3">
-               <div className="flex items-center justify-center">
-                <p className="text-6xl font-display font-black text-surface-900 stat-number" data-target="99">0</p>
-                <p className="text-4xl font-display font-black text-emerald-500">%</p>
-              </div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-surface-400">Elite Reviews</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Vibe Black Card CTA: Balanced */}
-      <section className="container mx-auto px-6 pb-24">
+      {/* Vibe Black Card: Ultra Premium */}
+      <section className="container mx-auto px-6 pb-32">
         <motion.div 
-          whileHover={{ y: -5 }}
-          className="bg-black rounded-[4rem] p-12 md:p-24 relative overflow-hidden border border-white/5"
+          whileHover={{ y: -10 }}
+          className="bg-black rounded-[5rem] p-16 md:p-32 relative overflow-hidden border border-white/5"
         >
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-500/10 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-blue-500/5 opacity-50" />
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-500/10 blur-[150px] rounded-full translate-x-1/2 -translate-y-1/2" />
           
-          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
-            <div className="flex-1 space-y-10 text-center lg:text-left">
-              <div className="inline-flex items-center gap-3 px-5 py-2 bg-white/5 border border-white/10 rounded-full">
-                 <FiZap className="text-brand-500" />
-                 <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/60">Elite Access</span>
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-24">
+            <div className="flex-1 space-y-12 text-center lg:text-left">
+              <div className="inline-flex items-center gap-3 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full">
+                 <FiZap className="text-brand-500 shadow-[0_0_10px_rgba(255,77,79,0.5)]" />
+                 <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/50">Vibe Elite Access</span>
               </div>
-              <h2 className="text-5xl md:text-7xl font-display font-black text-white uppercase tracking-tighter leading-[0.85]">
-                THE VIBE <br/>
+              <h2 className="text-6xl md:text-[8rem] font-display font-black text-white uppercase tracking-tighter leading-[0.85]">
+                UNVEIL THE <br/>
                 <span className="text-gradient">BLACK CARD.</span>
               </h2>
-              <p className="text-lg text-surface-400 font-medium max-w-lg leading-relaxed">
-                Join the inner circle. Priority dispatch, secret menu items, and private culinary events.
+              <p className="text-xl text-surface-400 font-medium max-w-xl leading-relaxed">
+                Join the inner circle of the PizzaVibe elite. Unlock priority dispatch, secret menu items, and private culinary sessions.
               </p>
-              <div className="flex justify-center lg:justify-start">
-                 <Link to="/menu" className="btn-primary !px-12 !py-5 text-xs !bg-white !text-black hover:!bg-brand-500 hover:!text-white">
-                   Apply For Access
+              <div className="flex justify-center lg:justify-start pt-4">
+                 <Link to="/menu" className="btn-primary !px-16 !py-6 text-sm !bg-white !text-black hover:!bg-brand-500 hover:!text-white transition-all duration-500 shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
+                   Apply For Membership
                  </Link>
               </div>
             </div>
@@ -358,22 +388,26 @@ const Home = () => {
             <div className="flex-1 perspective-1000 w-full">
                <motion.div 
                  animate={{ 
-                   rotateY: [0, 10, 0, -10, 0],
-                   rotateX: [0, -5, 0, 5, 0],
-                   y: [0, -10, 0]
+                   rotateY: [0, 15, 0, -15, 0],
+                   rotateX: [0, -10, 0, 10, 0],
+                   y: [0, -20, 0]
                  }}
                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                 className="w-full max-w-md mx-auto aspect-[1.6/1] bg-gradient-to-br from-zinc-800 to-black rounded-[2.5rem] p-12 border border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.7)] relative"
+                 className="w-full max-w-lg mx-auto aspect-[1.6/1] bg-gradient-to-br from-zinc-800 to-black rounded-[3rem] p-16 border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative overflow-hidden group"
                >
-                  <div className="flex justify-between items-start">
-                    <div className="w-12 h-12 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center">
-                      <FiZap className="text-brand-500 w-6 h-6" />
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+                  <div className="relative z-10 flex justify-between items-start">
+                    <div className="w-16 h-16 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center group-hover:bg-brand-500/20 transition-colors">
+                      <FiZap className="text-brand-500 w-8 h-8" />
                     </div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">VIBE ELITE</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/30">ELITE MASTER</p>
                   </div>
-                  <div className="absolute bottom-12 left-12">
-                     <p className="text-[7px] font-black uppercase tracking-widest text-white/20 mb-1">Member Name</p>
-                     <p className="text-2xl font-display font-black tracking-widest text-white uppercase">ELITE MASTER</p>
+                  <div className="relative z-10 absolute bottom-16 left-16">
+                     <p className="text-[8px] font-black uppercase tracking-widest text-white/20 mb-2">Member Serial</p>
+                     <p className="text-3xl font-display font-black tracking-widest text-white uppercase">VIBE-086-XXXX</p>
+                  </div>
+                  <div className="relative z-10 absolute bottom-16 right-16">
+                     <p className="text-4xl font-display font-black text-white/10 italic">P.</p>
                   </div>
                </motion.div>
             </div>

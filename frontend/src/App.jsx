@@ -24,6 +24,7 @@ import ManageCoupons from './pages/admin/ManageCoupons';
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
 import PreLoader from './components/PreLoader';
+import CursorGlow from './components/CursorGlow';
 
 function App() {
   const location = useLocation();
@@ -57,7 +58,12 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <PreLoader />
-        <div className="min-h-screen bg-surface-50">
+        <CursorGlow />
+        
+        {/* Cinematic Grain/Noise Overlay */}
+        <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[9999] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
+        <div className="min-h-screen bg-surface-50 relative overflow-hidden">
           <Toaster position="top-center" reverseOrder={false} />
           <Navbar />
           <AnimatePresence mode="wait">
