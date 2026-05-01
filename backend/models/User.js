@@ -47,6 +47,11 @@ const User = sequelize.define('User', {
 
 // Instance method to match password
 User.prototype.matchPassword = async function(enteredPassword) {
+  // Fallback: If the stored password isn't a bcrypt hash (doesn't start with $), do a plain-text comparison.
+  // This is needed because users were manually inserted into Supabase with plain text passwords.
+  if (!this.password.startsWith('$')) {
+    return enteredPassword === this.password;
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
