@@ -1,26 +1,42 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiUser, FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const validate = () => {
+    const { name, email, password } = formData;
+    if (!name.trim() || name.length < 2) {
+      toast.error('Name must be at least 2 characters');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password } = formData;
-    if (!name || !email || !password) {
-      return toast.error('Please fill in all fields');
-    }
+    if (!validate()) return;
     
     setIsSubmitting(true);
     try {
-      await register(name, email, password);
-      toast.success('Registration successful! Please sign in.');
+      await register(formData.name, formData.email, formData.password);
+      toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (err) {
       toast.error(err || 'Registration failed');
@@ -36,7 +52,7 @@ const Register = () => {
       <div className="absolute top-0 left-0 -translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-brand-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
       <div className="absolute bottom-0 right-0 translate-y-1/4 translate-x-1/4 w-[500px] h-[500px] bg-amber-500/10 blur-[100px] rounded-full -z-10 animate-float" />
       
-      {/* Floating Artisan Elements (Abstract) */}
+      {/* Floating Italian Elements (Abstract) */}
       <div className="absolute top-1/3 right-10 w-12 h-12 border-2 border-brand-500/20 rounded-full animate-float -z-10 hidden lg:block" />
       <div className="absolute bottom-1/3 left-10 w-16 h-16 border-2 border-amber-500/20 rounded-2xl -rotate-12 animate-float -z-10 hidden lg:block" style={{ animationDelay: '1.5s' }} />
 
@@ -61,7 +77,7 @@ const Register = () => {
               JOIN THE <span className="text-gradient">TRIBE</span>
             </h1>
             <p className="text-[8px] text-surface-400 font-black uppercase tracking-[0.25em]">
-              Artisan Vibes Start Here.
+              Italian Vibes Start Here.
             </p>
           </div>
 
@@ -75,7 +91,7 @@ const Register = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="John Doe"
-                  className="input-field !pl-10 !py-2.5 !bg-surface-200/40 focus:!bg-surface-200/60 text-[13px] !text-surface-900"
+                  className="input-field !pl-10 !py-2.5 !bg-black/40 focus:!bg-black/60 text-[13px] text-white"
                   required
                 />
               </div>
@@ -89,8 +105,8 @@ const Register = () => {
                   type="email" 
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="name@example.com"
-                  className="input-field !pl-10 !py-2.5 !bg-surface-200/40 focus:!bg-surface-200/60 text-[13px] !text-surface-900"
+                  placeholder="john@example.com"
+                  className="input-field !pl-10 !py-2.5 !bg-black/40 focus:!bg-black/60 text-[13px] text-white"
                   required
                 />
               </div>
@@ -101,13 +117,20 @@ const Register = () => {
               <div className="relative group">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-500 group-focus-within:text-brand-500 transition-colors text-xs" />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="••••••••"
-                  className="input-field !pl-10 !py-2.5 !bg-surface-200/40 focus:!bg-surface-200/60 text-[13px] !text-surface-900"
+                  className="input-field !pl-10 !pr-10 !py-2.5 !bg-black/40 focus:!bg-black/60 text-[13px] text-white"
                   required
                 />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-500 hover:text-brand-500 transition-colors"
+                >
+                  {showPassword ? <FiEyeOff className="text-xs" /> : <FiEye className="text-xs" />}
+                </button>
               </div>
             </div>
 

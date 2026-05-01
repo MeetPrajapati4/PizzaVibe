@@ -63,14 +63,22 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const res = await axios.post(`${API_URL}/register`, { name, email, password });
-      const { user: userData, token: newToken } = res.data;
-      setUser(userData);
-      setToken(newToken);
-      localStorage.setItem('pizza_user', JSON.stringify(userData));
+      await axios.post(`${API_URL}/register`, { name, email, password });
       return { success: true };
     } catch (error) {
       throw error.response?.data?.message || 'Registration failed';
+    }
+  };
+
+  const updateProfile = async (name, email) => {
+    try {
+      const res = await axios.put(`${API_URL}/profile`, { name, email });
+      const { user: userData } = res.data;
+      setUser(userData);
+      localStorage.setItem('pizza_user', JSON.stringify(userData));
+      return { success: true };
+    } catch (error) {
+      throw error.response?.data?.message || 'Profile update failed';
     }
   };
 
@@ -87,6 +95,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login, 
     register,
+    updateProfile,
     logout, 
     isAuthenticated: !!user
   };

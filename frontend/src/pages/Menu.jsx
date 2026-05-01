@@ -1,14 +1,47 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import FoodCard from '../components/FoodCard.jsx';
+import { FoodCardSkeleton } from '../components/SkeletonLoader.jsx';
 import { FiSearch, FiLoader, FiChevronDown, FiZap } from 'react-icons/fi';
 import { getByCategory, localizeItem } from '../externalApi.js';
+import { useAuth } from '../context/AuthContext';
+
+const SHUFFLE_KEY = 'pizzavibe_menu_shuffle';
+const SHUFFLE_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
+
+const seededShuffle = (array, seed) => {
+  const shuffled = [...array];
+  let currentSeed = seed;
+  const nextRandom = () => {
+    currentSeed = (currentSeed * 16807 + 0) % 2147483647;
+    return (currentSeed - 1) / 2147483646;
+  };
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(nextRandom() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+const getShuffleSeed = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(SHUFFLE_KEY));
+    if (stored && Date.now() - stored.timestamp < SHUFFLE_INTERVAL_MS) {
+      return stored.seed;
+    }
+  } catch { /* ignore corrupt data */ }
+  const newSeed = Math.floor(Math.random() * 2147483646) + 1;
+  localStorage.setItem(SHUFFLE_KEY, JSON.stringify({ seed: newSeed, timestamp: Date.now() }));
+  return newSeed;
+};
 
 const Menu = () => {
+  const { user } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState({ field: '', order: '' });
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(null);
 
   const sortOptions = [
     { label: 'Featured', field: '', order: '' },
@@ -17,14 +50,51 @@ const Menu = () => {
     { label: 'Customer Favorite', field: 'rate', order: 'desc' },
   ];
 
+  // Generate a new shuffle seed on login; reuse within 12-hour window
+  useEffect(() => {
+    if (user) {
+      setShuffleSeed(getShuffleSeed());
+    } else {
+      setShuffleSeed(null);
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
       try {
         const data = await getByCategory('pizzas');
-        if (data) {
+        if (data && Array.isArray(data)) {
           const localized = data.map(item => localizeItem(item));
-          setItems(localized);
+          
+          // --- UNIVERSAL UNIQUENESS GUARD (Name, Image, Price, Description) ---
+          const uniqueItems = [];
+          const seenNames = new Set();
+          const seenImages = new Set();
+          const seenPrices = new Set();
+          const seenDescs = new Set();
+
+          localized.forEach(item => {
+            const normalizedName = item.name.toLowerCase().trim();
+            const normalizedImage = item.image.split('?')[0].trim();
+            const priceKey = String(item.price);
+            const descKey = item.description?.toLowerCase().trim().substring(0, 50);
+            
+            if (
+              !seenNames.has(normalizedName) && 
+              !seenImages.has(normalizedImage) && 
+              !seenPrices.has(priceKey) &&
+              (!descKey || !seenDescs.has(descKey))
+            ) {
+              seenNames.add(normalizedName);
+              seenImages.add(normalizedImage);
+              seenPrices.add(priceKey);
+              if (descKey) seenDescs.add(descKey);
+              uniqueItems.push(item);
+            }
+          });
+          
+          setItems(uniqueItems);
         }
       } catch (error) {
         console.error("Failed to fetch menu:", error);
@@ -36,6 +106,11 @@ const Menu = () => {
 
   const processedItems = useMemo(() => {
     let result = [...items];
+
+    // Shuffle positions for logged-in users (changes every 12 hours)
+    if (shuffleSeed && !sortBy.field && !searchQuery) {
+      result = seededShuffle(result, shuffleSeed);
+    }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -55,7 +130,7 @@ const Menu = () => {
     }
 
     return result;
-  }, [items, searchQuery, sortBy]);
+  }, [items, searchQuery, sortBy, shuffleSeed]);
 
   return (
     <div className="pt-32 pb-20 min-h-screen">
@@ -126,16 +201,19 @@ const Menu = () => {
 
         {/* Loading State */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-40 gap-4">
-            <FiLoader className="w-12 h-12 text-brand-500 animate-spin" />
-            <p className="text-surface-500 font-black uppercase tracking-[0.2em] text-[10px]">Filtering Best Flavors...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-            {processedItems.map((item) => (
-              <FoodCard key={item.id} food={item} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
+              <FoodCardSkeleton key={i} />
             ))}
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {processedItems.map((food, idx) => (
+            <div key={food.id} className={`animate-slide-up stagger-${(idx % 5) + 1}`}>
+              <FoodCard food={food} />
+            </div>
+          ))}
+        </div>
         )}
 
         {!loading && processedItems.length === 0 && (

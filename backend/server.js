@@ -13,6 +13,7 @@ import cartRoutes from './routes/cart.js';
 import orderRoutes from './routes/orders.js';
 import dominosRoutes from './routes/dominos.js';
 import adminRoutes from './routes/admin.js';
+import './models/index.js'; // Ensure models are registered
 
 const app = express();
 

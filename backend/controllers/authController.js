@@ -16,7 +16,6 @@ const buildUserPayload = (user) => ({
   name: user.name,
   email: user.email,
   role: user.role,
-  avatar: user.avatar,
   isAdmin: user.role === 'admin'
 });
 
@@ -80,4 +79,31 @@ export const login = async (req, res, next) => {
 
 export const getProfile = async (req, res) => {
   return res.json({ user: buildUserPayload(req.user) });
+};
+
+export const updateProfile = async (req, res, next) => {
+  try {
+    const { name, email } = req.body;
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (email && email !== user.email) {
+      const exists = await User.findOne({ where: { email } });
+      if (exists) {
+        return res.status(409).json({ message: 'Email already in use' });
+      }
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+
+    return res.json({ user: buildUserPayload(user) });
+  } catch (error) {
+    next(error);
+  }
 };

@@ -1,11 +1,11 @@
 {
   "name": "pizzavibe-backend",
   "version": "1.0.0",
-  "description": "PizzaVibe Artisan — Backend API Server",
+  "description": "PizzaVibe Italian — Backend API Server",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch server.js",
+    "dev": "nodemon server.js",
     "start": "node server.js",
     "seed": "node seed.js"
   },
@@ -29,5 +29,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }

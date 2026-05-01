@@ -1,11 +1,14 @@
 -- =============================================
 -- Database Redesign for PizzaVibe
 -- Target: XAMPP phpMyAdmin (MySQL/MariaDB)
+-- Matches Sequelize Models exactly
 -- =============================================
 
+SET FOREIGN_KEY_CHECKS = 0;
 DROP DATABASE IF EXISTS pizzavibe;
 CREATE DATABASE IF NOT EXISTS pizzavibe;
 USE pizzavibe;
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Users Table
 CREATE TABLE Users (
@@ -25,7 +28,7 @@ CREATE TABLE Pizzas (
     name VARCHAR(150) NOT NULL,
     image VARCHAR(255) NOT NULL,
     description TEXT,
-    category ENUM('veg', 'non-veg', 'premium') NOT NULL,
+    category VARCHAR(50) DEFAULT 'veg',
     price DECIMAL(10, 2) NOT NULL,
     small_price DECIMAL(10, 2) DEFAULT 0,
     medium_price DECIMAL(10, 2) DEFAULT 0,
@@ -66,44 +69,49 @@ CREATE TABLE OrderItems (
     image VARCHAR(255),
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL DEFAULT 1,
-    size ENUM('small', 'medium', 'large') DEFAULT 'medium',
+    size VARCHAR(50) DEFAULT 'medium',
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (orderId) REFERENCES Orders(id) ON DELETE CASCADE,
     FOREIGN KEY (pizzaId) REFERENCES Pizzas(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 5. Coupons Table (New for Redesign)
+-- 5. Coupons Table
 CREATE TABLE Coupons (
     id INT AUTO_INCREMENT PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
-    discount_type ENUM('percentage', 'fixed') NOT NULL,
-    discount_value DECIMAL(10, 2) NOT NULL,
-    min_order_amount DECIMAL(10, 2) DEFAULT 0,
-    expiry_date DATETIME NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
+    discount INT NOT NULL,
+    minOrder DECIMAL(10, 2) DEFAULT 0,
+    maxDiscount DECIMAL(10, 2) DEFAULT 0,
+    isActive BOOLEAN DEFAULT TRUE,
+    usedCount INT DEFAULT 0,
+    expiryDate DATETIME,
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- =============================================
--- FIXED ADMIN CREDENTIALS
--- Username: Admin@Boss
--- Password: Boss@2026
--- No signup needed. Admin is pre-inserted.
+-- INITIAL SEED DATA
 -- =============================================
 
+-- Admin Credentials: admin@pizzavibe.com / Admin@123
 INSERT INTO Users (name, email, password, role) 
-VALUES (
-    'Main Admin', 
-    'Admin@Boss', 
-    '$2a$12$j0i5zpTKaOmERAGizWjbz.GRXw.XCv815FuOR7n2b32N.DLJPKHG.', 
-    'admin'
-);
+VALUES ('System Admin', 'admin@pizzavibe.com', '$2a$12$j0i5zpTKaOmERAGizWjbz.GRXw.XCv815FuOR7n2b32N.DLJPKHG.', 'admin');
 
--- Seed initial pizzas
-INSERT INTO Pizzas (name, image, description, category, price, small_price, medium_price, large_price)
+-- Demo User: user@pizzavibe.com / User@123
+INSERT INTO Users (name, email, password, role) 
+VALUES ('Demo User', 'user@pizzavibe.com', '$2a$12$R6Mv.B6u6X5hG7u2j9zUGuJ1p7Wp6G6K6U6U6U6U6U6U6U6U6U6U.', 'user');
+
+-- Sample Artisanal Pizzas
+INSERT INTO Pizzas (name, image, description, category, price, small_price, medium_price, large_price, averageRating, totalReviews)
 VALUES 
-('Margherita', 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca', 'Classic delight with 100% real mozzarella cheese', 'veg', 199, 199, 299, 449),
-('Farmhouse', 'https://images.unsplash.com/photo-1571407970349-bc81e7e96d47', 'Delightful combination of onion, capsicum, tomato & mushroom', 'veg', 249, 249, 399, 599),
-('Pepperoni Pizza', 'https://images.unsplash.com/photo-1628840042765-356cda07504e', 'Classic pepperoni with extra cheese', 'non-veg', 299, 299, 499, 699);
+('Truffle Mushroom', 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&q=80', 'Wild mushroom medley with truffle oil and fresh thyme.', 'premium', 549, 449, 549, 699, 4.9, 89),
+('Seafood Sensation', 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80', 'Squid, mussels, prawns, and tuna with a dash of lemon.', 'premium', 649, 529, 649, 829, 4.6, 54),
+('Butter Chicken Pizza', 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=600&q=80', 'Classic butter chicken gravy base with succulent chicken chunks.', 'non-veg', 489, 399, 489, 639, 4.9, 420),
+('Margherita Classic', 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80', 'Fresh mozzarella, San Marzano tomato sauce, and aromatic basil.', 'veg', 249, 199, 249, 329, 4.5, 128);
+
+-- Sample Coupons
+INSERT INTO Coupons (code, discount, minOrder, maxDiscount, expiryDate)
+VALUES 
+('WELCOME20', 20, 300, 200, '2027-12-31 23:59:59'),
+('PIZZAVIBE50', 50, 500, 500, '2027-06-30 23:59:59');

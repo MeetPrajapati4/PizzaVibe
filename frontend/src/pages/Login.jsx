@@ -1,19 +1,33 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowRight, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const validate = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return false;
+    }
+    if (password.length < 1) {
+      toast.error('Password is required');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) return toast.error('Please fill in all fields');
+    if (!validate()) return;
     
     setIsSubmitting(true);
     try {
@@ -21,7 +35,8 @@ const Login = () => {
       toast.success('Welcome back, Vibers!');
       navigate('/');
     } catch (err) {
-      toast.error(err || 'Login failed');
+      toast.error(err || 'Login failed. Please register.');
+      navigate('/register');
     } finally {
       setIsSubmitting(false);
     }
@@ -33,7 +48,7 @@ const Login = () => {
       <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-brand-500/10 blur-[120px] rounded-full -z-10 animate-pulse" />
       <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[500px] h-[500px] bg-amber-500/10 blur-[100px] rounded-full -z-10 animate-float" />
       
-      {/* Floating Artisan Elements (Abstract) */}
+      {/* Floating Italian Elements (Abstract) */}
       <div className="absolute top-1/4 left-10 w-12 h-12 border-2 border-brand-500/20 rounded-full animate-float -z-10 hidden lg:block" />
       <div className="absolute bottom-1/4 right-10 w-16 h-16 border-2 border-amber-500/20 rounded-2xl rotate-12 animate-float -z-10 hidden lg:block" style={{ animationDelay: '1s' }} />
 
@@ -72,7 +87,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="input-field !pl-10 !py-2.5 !bg-surface-200/40 focus:!bg-surface-200/60 text-[13px] !text-surface-900"
+                  className="input-field !pl-10 !py-2.5 !bg-black/40 focus:!bg-black/60 text-[13px] text-white"
                   required
                 />
               </div>
@@ -86,13 +101,20 @@ const Login = () => {
               <div className="relative group">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-500 group-focus-within:text-brand-500 transition-colors text-xs" />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-field !pl-10 !py-2.5 !bg-surface-200/40 focus:!bg-surface-200/60 text-[13px] !text-surface-900"
+                  className="input-field !pl-10 !pr-10 !py-2.5 !bg-black/40 focus:!bg-black/60 text-[13px] text-white"
                   required
                 />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-500 hover:text-brand-500 transition-colors"
+                >
+                  {showPassword ? <FiEyeOff className="text-xs" /> : <FiEye className="text-xs" />}
+                </button>
               </div>
             </div>
 

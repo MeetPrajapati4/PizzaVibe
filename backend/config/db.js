@@ -20,8 +20,8 @@ const connectDB = async () => {
     console.log('✅ MySQL/MariaDB connected via Sequelize (XAMPP)');
     
     // Sync models
-    // await sequelize.sync({ alter: true }); 
-    // console.log('🔄 Database models synchronized');
+    await sequelize.sync({ alter: true }); 
+    console.log('🔄 Database models synchronized');
   } catch (error) {
     console.error(`❌ MySQL connection error: ${error.message}`);
     console.log('💡 Ensure XAMPP MySQL is running and database "pizzavibe" exists.');
