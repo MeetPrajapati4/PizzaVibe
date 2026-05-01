@@ -137,15 +137,6 @@ const Home = () => {
       <section className="min-h-[90vh] relative flex items-center pt-24 pb-12" ref={heroRef}>
         <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-10 text-center lg:text-left">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-4 px-5 py-2 bg-white/5 border border-white/10 rounded-full"
-            >
-              <span className="w-2 h-2 bg-brand-500 rounded-full animate-pulse" />
-              <span className="text-[9px] font-black uppercase tracking-[0.5em] text-surface-400">Culinary Architecture</span>
-            </motion.div>
-
             <h1 className="text-6xl md:text-[8rem] font-display font-black leading-[0.8] tracking-tighter text-white uppercase">
               <span className="hero-line block overflow-hidden">PURE</span>
               <span className="hero-line block animate-text-shimmer overflow-hidden">VIBE.</span>
@@ -229,20 +220,27 @@ const Home = () => {
 
         <div className="grid lg:grid-cols-3 gap-12">
           {[
-            { img: "https://images.unsplash.com/photo-1556290624-9f4a0a58339c?w=800", title: "48H Slow Proof", desc: "Crust that is light, airy, and easily digestible." },
-            { img: "https://images.unsplash.com/photo-1628515670304-7667d4039162?w=800", title: "Rare Sourcing", desc: "San Marzano tomatoes and Buffalo Mozzarella flown in weekly." },
-            { img: "https://images.unsplash.com/photo-1595708684082-a173bb3a06c5?w=800", title: "Volcanic Heat", desc: "Blasted for 90 seconds at 450°C for perfect char." }
+            { img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800", title: "48H Slow Proof", desc: "Crust that is light, airy, and easily digestible." },
+            { img: "https://images.unsplash.com/photo-1593504049359-74330189a345?q=80&w=800", title: "Rare Sourcing", desc: "San Marzano tomatoes and Buffalo Mozzarella flown in weekly." },
+            { img: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?q=80&w=800", title: "Volcanic Heat", desc: "Blasted for 90 seconds at 450°C for perfect char." }
           ].map((step, i) => (
-            <div key={i} className="space-y-8 group">
-               <div className="relative h-80 rounded-[2.5rem] overflow-hidden bg-surface-200">
-                  <img src={step.img} alt={step.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute top-6 left-6 w-10 h-10 bg-white rounded-xl flex items-center justify-center text-black font-black">0{i+1}</div>
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="space-y-8 group"
+            >
+               <div className="relative h-80 rounded-[2.5rem] overflow-hidden bg-surface-200 border border-white/5">
+                  <img src={step.img} alt={step.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" />
+                  <div className="absolute top-6 left-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center text-white font-black border border-white/10">0{i+1}</div>
                </div>
                <div className="space-y-3 px-2">
                   <h3 className="text-2xl font-display font-black text-white uppercase tracking-tighter">{step.title}</h3>
                   <p className="text-surface-500 text-sm leading-relaxed">{step.desc}</p>
                </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -329,22 +327,38 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="flex-1 hidden lg:block">
+            <div className="flex-1 hidden lg:block perspective-2000">
                <motion.div 
-                 animate={{ y: [0, -15, 0] }}
-                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                 className="w-full aspect-[1.6/1] bg-gradient-to-br from-zinc-800 to-black rounded-[3rem] p-16 border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative group overflow-hidden"
+                 initial={{ rotateY: 30, rotateX: 10, y: 50, opacity: 0 }}
+                 whileInView={{ rotateY: 15, rotateX: 5, y: 0, opacity: 1 }}
+                 whileHover={{ rotateY: 0, rotateX: 0, scale: 1.05 }}
+                 transition={{ duration: 1.2, ease: "circOut" }}
+                 className="w-full aspect-[1.6/1] bg-gradient-to-br from-zinc-800 via-black to-zinc-900 rounded-[3rem] p-16 border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative group overflow-hidden cursor-pointer"
                >
-                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
-                  <div className="relative z-10 flex justify-between">
-                     <div className="w-14 h-14 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-500 text-2xl">
+                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                  
+                  <div className="relative z-10 flex justify-between items-start">
+                     <motion.div 
+                       animate={{ scale: [1, 1.1, 1] }}
+                       transition={{ duration: 2, repeat: Infinity }}
+                       className="w-14 h-14 bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-500 text-2xl border border-brand-500/20"
+                     >
                        <FiZap />
+                     </motion.div>
+                     <div className="text-right">
+                       <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.8em]">Vibe Elite</p>
+                       <p className="text-[7px] font-bold text-brand-500/60 uppercase tracking-[0.4em] mt-1">Status: Active</p>
                      </div>
-                     <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.8em]">Vibe Elite</p>
                   </div>
-                  <div className="absolute bottom-16 left-16">
-                     <p className="text-2xl font-display font-black text-white tracking-widest uppercase">VIBE-ID-882</p>
+
+                  <div className="absolute bottom-16 left-16 space-y-2">
+                     <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Card Holder Unique ID</p>
+                     <p className="text-2xl font-display font-black text-white tracking-[0.3em] uppercase drop-shadow-2xl">VIBE-ID-882</p>
                   </div>
+
+                  {/* Holographic Shine Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-gradient-to-r from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-[2000ms] pointer-events-none" />
                </motion.div>
             </div>
           </div>
