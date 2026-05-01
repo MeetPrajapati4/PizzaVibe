@@ -93,7 +93,7 @@ function App() {
                 <Route path="/admin/orders" element={<ProtectedRoute adminOnly><ManageOrders /></ProtectedRoute>} />
                 <Route path="/admin/users" element={<ProtectedRoute adminOnly><ManageUsers /></ProtectedRoute>} />
                 <Route path="/admin/coupons" element={<ProtectedRoute adminOnly><ManageCoupons /></ProtectedRoute>} />
-                <Route path="/supabase" element={<SupabaseUsers />} />
+                <Route path="/supabase" element={<ProtectedRoute adminOnly><SupabaseUsers /></ProtectedRoute>} />
 
               </Routes>
               <Footer />
