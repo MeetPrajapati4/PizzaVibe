@@ -335,7 +335,7 @@ const Home = () => {
                  transition={{ duration: 1.2, ease: "circOut" }}
                  className="w-full aspect-[1.6/1] bg-gradient-to-br from-zinc-800 via-black to-zinc-900 rounded-[3rem] p-16 border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative group overflow-hidden cursor-pointer"
                >
-                  <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-overlay" />
                   <div className="absolute inset-0 bg-gradient-to-tr from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                   
                   <div className="relative z-10 flex justify-between items-start">
