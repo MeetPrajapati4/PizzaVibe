@@ -92,13 +92,9 @@ const Menu = () => {
 
         finalItems.forEach(item => {
           const normalizedName = item.name.toLowerCase().trim();
-          const normalizedImage = item.image.split('?')[0].trim();
-          const priceKey = String(item.price);
           
-          if (!seenNames.has(normalizedName) && !seenImages.has(normalizedImage) && !seenPrices.has(priceKey)) {
+          if (!seenNames.has(normalizedName)) {
             seenNames.add(normalizedName);
-            seenImages.add(normalizedImage);
-            seenPrices.add(priceKey);
             uniqueItems.push(item);
           }
         });

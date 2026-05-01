@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { FiPlus, FiStar, FiShoppingBag, FiZap } from 'react-icons/fi';
+import { FiStar, FiZap, FiClock } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import TiltContainer from './TiltContainer';
 import { motion, AnimatePresence } from 'framer-motion';
