@@ -1,11 +1,10 @@
 import 'dotenv/config';
-import { sequelize } from './config/db.js';
+import mongoose from 'mongoose';
 import User from './models/User.js';
 import Pizza from './models/Pizza.js';
 import Coupon from './models/Coupon.js';
 
 const PIZZAS = [
-  // --- 9 Items from Unsplash (Specific IDs) ---
   { name: 'Classic Margherita', image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80', price: 299, category: 'veg', description: 'Fresh mozzarella, tomato sauce, and aromatic basil.' },
   { name: 'Truffle Mushroom Italian', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800&q=80', price: 589, category: 'premium', description: 'Wild mushrooms with truffle oil and fresh thyme.' },
   { name: 'Prawn Pesto', image: 'https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=800&q=80', price: 649, category: 'premium', description: 'Tiger prawns, house-made basil pesto, and goat cheese.' },
@@ -15,8 +14,6 @@ const PIZZAS = [
   { name: 'Butter Chicken Special', image: 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=800&q=80', price: 599, category: 'non-veg', description: 'Classic butter chicken gravy base with succulent chicken.' },
   { name: 'Peri-Peri Poultry', image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=800&q=80', price: 529, category: 'non-veg', description: 'Peri-peri marinated chicken and red peppers.' },
   { name: 'Four Cheese Bliss', image: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=800&q=80', price: 519, category: 'premium', description: 'Mozzarella, gorgonzola, parmesan, and cheddar.' },
-
-  // --- 9 Items from Foodish API (Pizza category) ---
   { name: 'Veggie Supreme', image: 'https://foodish-api.com/images/pizza/pizza1.jpg', price: 449, category: 'veg', description: 'An explosion of flavors with seasonal fresh vegetables.' },
   { name: 'Artichoke Pine Nut', image: 'https://foodish-api.com/images/pizza/pizza10.jpg', price: 429, category: 'veg', description: 'Marinated artichoke hearts and toasted pine nuts.' },
   { name: 'Pesto Paradise', image: 'https://foodish-api.com/images/pizza/pizza15.jpg', price: 469, category: 'veg', description: 'Home-made basil pesto with sun-dried tomatoes.' },
@@ -30,48 +27,37 @@ const PIZZAS = [
 
 async function seedData() {
   try {
-    await sequelize.authenticate();
-    console.log('✅ Connected to MySQL for seeding.');
+    const mongoURI = process.env.MONGODB_URI || process.env.DATABASE_URL;
+    if (!mongoURI) throw new Error('MONGODB_URI is not defined in .env');
 
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-    await sequelize.sync({ force: true });
-    console.log('🔄 Database synchronized (All tables recreated).');
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    await mongoose.connect(mongoURI);
+    console.log('✅ Connected to MongoDB for seeding.');
 
-    await User.create({
-      name: 'Admin',
-      email: 'admin@pizzavibe.com',
-      password: 'Admin@123',
-      role: 'admin'
-    });
+    // Clear existing data
+    await User.deleteMany({});
+    await Pizza.deleteMany({});
+    await Coupon.deleteMany({});
+    console.log('🗑️ Existing data cleared.');
 
-    await User.create({
-      name: 'Demo User',
-      email: 'user@pizzavibe.com',
-      password: 'User@123',
-      role: 'user'
-    });
+    await User.create([
+      { name: 'Admin', email: 'Admin@Boss', password: 'Admin@BossPassword123', role: 'admin' },
+      { name: 'Demo User', email: 'user@pizzavibe.com', password: 'User@123', role: 'user' }
+    ]);
 
-    // Ensure 18 items with strictly unique attributes
-    const processedPizzas = PIZZAS.slice(0, 18).map((p, idx) => {
-      const uniquePrice = p.price + (idx * 17); // Use a large prime offset for prices
-      
-      return {
-        ...p,
-        price: uniquePrice,
-        small_price: Math.round(uniquePrice * 0.8),
-        medium_price: uniquePrice,
-        large_price: Math.round(uniquePrice * 1.3),
-        isAvailable: true,
-        averageRating: 4.5 + (idx % 5) / 10,
-        totalReviews: 120 + idx * 30
-      };
-    });
+    const processedPizzas = PIZZAS.map((p, idx) => ({
+      ...p,
+      small_price: Math.round(p.price * 0.8),
+      medium_price: p.price,
+      large_price: Math.round(p.price * 1.3),
+      isAvailable: true,
+      averageRating: 4.5 + (idx % 5) / 10,
+      totalReviews: 120 + idx * 30
+    }));
 
-    await Pizza.bulkCreate(processedPizzas);
-    console.log(`🍕 Seeded exactly ${processedPizzas.length} unique pizzas using Dual-API imagery.`);
+    await Pizza.insertMany(processedPizzas);
+    console.log(`🍕 Seeded ${processedPizzas.length} artisan pizzas.`);
 
-    await Coupon.bulkCreate([
+    await Coupon.insertMany([
       { code: 'WELCOME20', discount: 20, minOrder: 300, maxDiscount: 200, expiryDate: new Date('2027-12-31') },
       { code: 'PIZZAVIBE50', discount: 50, minOrder: 500, maxDiscount: 500, expiryDate: new Date('2027-06-30') }
     ]);
@@ -79,7 +65,7 @@ async function seedData() {
     console.log('✅ Database seeded successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Seed error:', error);
+    console.error('❌ Seed error:', error.message);
     process.exit(1);
   }
 }

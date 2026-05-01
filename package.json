@@ -20,5 +20,8 @@
       "entrypoint": "backend",
       "routePrefix": "/_/backend"
     }
+  },
+  "dependencies": {
+    "mongoose": "^9.6.1"
   }
 }
