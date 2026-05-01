@@ -21,5 +21,16 @@
       "source": "/((?!api|_/backend).*)",
       "destination": "/frontend/dist/index.html"
     }
-  ]
+  ],
+  "experimentalServices": {
+    "frontend": {
+      "entrypoint": "frontend",
+      "routePrefix": "/",
+      "framework": "vite"
+    },
+    "backend": {
+      "entrypoint": "backend",
+      "routePrefix": "/_/backend"
+    }
+  }
 }
