@@ -42,7 +42,8 @@ const User = sequelize.define('User', {
         user.password = await bcrypt.hash(user.password, salt);
       }
     }
-  }
+  },
+  tableName: 'users',
 });
 
 // Instance method to match password
