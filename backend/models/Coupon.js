@@ -3,8 +3,8 @@ import { sequelize } from '../config/db.js';
 
 const Coupon = sequelize.define('Coupon', {
   id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   code: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -14,6 +14,9 @@ const Coupon = sequelize.define('Coupon', {
   isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
   usedCount: { type: DataTypes.INTEGER, defaultValue: 0 },
   expiryDate: { type: DataTypes.DATE, allowNull: true }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  tableName: 'coupons'
+});
 
 export default Coupon;

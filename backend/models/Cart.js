@@ -3,12 +3,12 @@ import { sequelize } from '../config/db.js';
 
 export const Cart = sequelize.define('Cart', {
   id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   userId: {
-    type: DataTypes.UUID,
+    type: DataTypes.INTEGER,
     allowNull: false,
     unique: true
   },
@@ -16,20 +16,23 @@ export const Cart = sequelize.define('Cart', {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0
   }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  tableName: 'carts'
+});
 
 export const CartItem = sequelize.define('CartItem', {
   id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   cartId: {
-    type: DataTypes.UUID,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   pizzaId: {
-    type: DataTypes.UUID,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   name: { type: DataTypes.STRING, allowNull: false },
@@ -40,6 +43,9 @@ export const CartItem = sequelize.define('CartItem', {
     type: DataTypes.STRING, 
     defaultValue: 'medium' 
   }
-}, { timestamps: false });
+}, { 
+  timestamps: false,
+  tableName: 'cartitems'
+});
 
 export default Cart;

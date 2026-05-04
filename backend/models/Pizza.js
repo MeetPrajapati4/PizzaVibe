@@ -3,8 +3,8 @@ import { sequelize } from '../config/db.js';
 
 const Pizza = sequelize.define('Pizza', {
   id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   name: { type: DataTypes.STRING, allowNull: false },
@@ -21,6 +21,9 @@ const Pizza = sequelize.define('Pizza', {
   isAvailable: { type: DataTypes.BOOLEAN, defaultValue: true },
   averageRating: { type: DataTypes.FLOAT, defaultValue: 4.5 },
   totalReviews: { type: DataTypes.INTEGER, defaultValue: 0 }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  tableName: 'pizzas'
+});
 
 export default Pizza;

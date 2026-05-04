@@ -21,10 +21,13 @@ const OrderItem = sequelize.define('OrderItem', {
     allowNull: false,
     defaultValue: 1
   },
-  size: {
+    size: {
     type: DataTypes.STRING,
     defaultValue: 'medium'
   }
+}, { 
+  timestamps: true,
+  tableName: 'orderitems'
 });
 
 // Associations are now defined in models/index.js

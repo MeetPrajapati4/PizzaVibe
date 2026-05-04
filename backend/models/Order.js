@@ -3,12 +3,12 @@ import { sequelize } from '../config/db.js';
 
 const Order = sequelize.define('Order', {
   id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   userId: {
-    type: DataTypes.UUID,
+    type: DataTypes.INTEGER,
     allowNull: false
   },
   totalAmount: {
@@ -34,6 +34,9 @@ const Order = sequelize.define('Order', {
   },
   couponApplied: { type: DataTypes.STRING },
   discount: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 }
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  tableName: 'orders'
+});
 
 export default Order;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { FiUserPlus, FiUsers, FiMail, FiUser, FiLoader, FiAlertCircle } from 'react-icons/fi';
@@ -12,7 +12,7 @@ const SupabaseUsers = () => {
     name: '',
     email: '',
   });
-
+  
   // Fetch all users
   const fetchUsers = async () => {
     try {
@@ -33,8 +33,7 @@ const SupabaseUsers = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-
+    fetchUsers();    
     // Realtime subscription — auto-refresh on any change to 'Users' table
     const channel = supabase
       .channel('realtime:users')
@@ -59,7 +58,7 @@ const SupabaseUsers = () => {
     try {
       setInserting(true);
       const { data, error } = await supabase
-        .from('Users')
+        .from('users')
         .insert([
           { 
             name: formData.name, 
